@@ -46,6 +46,22 @@ function Sidebar() {
             Users
           </Link>
         </li>
+        <li className="mb-3">
+          <Link
+            to="/slide"
+            className="block py-2 px-3 rounded-md hover:bg-gray-700 hover:text-yellow-300 transition-all duration-300"
+          >
+            Slide
+          </Link>
+        </li>
+        <li className="mb-3">
+          <Link
+            to="/slide/info"
+            className="block py-2 px-3 rounded-md hover:bg-gray-700 hover:text-yellow-300 transition-all duration-300"
+          >
+            Slide Information
+          </Link>
+        </li>
       </ul>
     </div>
   );
