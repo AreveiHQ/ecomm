@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+const server = import.meta.env.VITE_BACKEND_SERVER;
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
@@ -10,7 +11,7 @@ const OrdersPage = () => {
     const fetchOrders = async () => {
       try {
         const { data } = await axios.get(
-          "http://localhost:3000/api/v1/admin/orders"
+          `${server}/v1/admin/orders`
         );
         setOrders(data);
       } catch (error) {

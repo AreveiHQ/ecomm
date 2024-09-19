@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+const server = import.meta.env.VITE_BACKEND_SERVER;
 
 function ProductList() {
   const [products, setProducts] = useState([]);
@@ -25,7 +26,7 @@ function ProductList() {
   const fetchProducts = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3000/api/v1/admin/products/"
+        `${server}/v1/admin/products/`
       );
       setProducts(response.data);
     } catch (error) {
@@ -35,7 +36,7 @@ function ProductList() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/api/v1/admin/products/${id}`);
+      await axios.delete(`${server}/v1/admin/products/${id}`);
       toast.success("Product deleted successfully");
       fetchProducts(); // Refresh the list after deletion
     } catch (error) {
@@ -68,7 +69,7 @@ function ProductList() {
       };
 
       await axios.put(
-        `http://localhost:3000/api/v1/admin/products/${editingProduct}`,
+        `${server}/v1/admin/products/${editingProduct}`,
         updatedData
       );
       toast.success("Product updated successfully");

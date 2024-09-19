@@ -8,8 +8,7 @@ function UsersPage() {
   useEffect(() => {
     // Fetch data from the backend
     //localhost:3000/api/v1/admin/users
-    http: axios
-      .get(`http://localhost:3000/api/v1/admin/users`)
+    axios.get(`${server}/v1/admin/users`)
       .then((response) => {
         setUsers(response.data); // Set the user data
       })

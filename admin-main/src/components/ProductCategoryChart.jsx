@@ -10,6 +10,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+const server = import.meta.env.VITE_BACKEND_SERVER;
 
 // const data = [
 //   { category: "Electronics", products: 120 },
@@ -37,7 +38,7 @@ function ProductCategoryChart() {
     const fetchOrders = async () => {
       try {
         const data = await axios.get(
-          "http://localhost:3000/api/v1/admin/dashBoardAllOrders"
+         ` ${server}/v1/admin/dashBoardAllOrders`
         );
         data.data.forEach(element => {
           // console.log(element.orders);

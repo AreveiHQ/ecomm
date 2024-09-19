@@ -3,27 +3,20 @@ import { Transition } from "@headlessui/react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Search,
-  FavoriteBorder,
   ShoppingBag,
   Menu,
   Login,
   Logout,
-  AddBox,
 } from "@mui/icons-material";
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
 
 import {
   Badge,
   IconButton,
-  Drawer,
-  List,
-  ListItem,
-  ListItemText,
 } from "@mui/material";
 
 
 import logo from "../../assets/newlogo.jpeg";
-import gplay from "../../assets/gplay.png";
 import menuItems from "../../assets/menuItems";
 import DrawerComponent from "../DrawerComponent/DrawerComponent";
 import { UserContext } from "../../Context/UserContext";
@@ -170,9 +163,7 @@ const Navbar = () => {
               {/* <FavoriteBorder /> */}
               <AccountCircleTwoToneIcon></AccountCircleTwoToneIcon>
           </IconButton>
-          <IconButton onClick={()=>navigate('/addProduct')}>
-              <AddBox />
-          </IconButton>
+
           <IconButton onClick={() => { navigate("/cart") }}>
             <Badge badgeContent={2} color="secondary">
               <ShoppingBag />

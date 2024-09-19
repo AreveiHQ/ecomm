@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+const server = import.meta.env.VITE_BACKEND_SERVER;
+
 import {
   LineChart,
   Line,
@@ -36,7 +38,7 @@ function No_Of_UsersChart() {
     const countUsersByMonth = async () => {
       try {
         const data = await axios.get(
-          "http://localhost:3000/api/v1/admin/dashboard"
+          `${server}/v1/admin/dashboard`
         );
         let demoObject=[{ month: "start", number_Of_Users_Enrolled: 0 }];
         let finalData=data.data;
