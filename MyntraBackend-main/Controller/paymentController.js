@@ -1,6 +1,7 @@
 const razorpayInstance = require("../rozarpay");
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
+const { PDFInvoice } = require('@h1dd3nsn1p3r/pdf-invoice');
 // Create Order in Razorpay
 exports.createOrder = async (req, res) => {
   console.log(req.body.amount);
@@ -43,33 +44,76 @@ exports.DownloadReciept =  async (req, res) => {
   const payment_id = req.query.payment_id;
   console.log(payment_id)
   try {
-    // Fetch payment details from Razorpay
-    const paymentDetails = await razorpayInstance.payments.fetch(payment_id);
+ 
+    const payload = {
+      company: {
+          logo: "<svg>...</svg>", // Optional. SVG logo of your company.
+          name: "Festrol Corp.",
+          address: "1711 W. El Segundo Blvd, Hawthorne, Canada - 90250",
+          phone: "Tel: (+11) 245 543 903",
+          email: "Mail: hello@festrol.io",
+          website: "Web: https://www.festrolcorp.io",
+          taxId: "Tax ID: 1234567890", // Optional.
+      },
+      customer: {
+          name: "John Doe",
+          company: "Xero Inc.", // Optional.
+          address: "1234 Main Street, New York, NY 10001",
+          phone: "Tel: (555) 555-5555",
+          email: "Mail: joe@example.com",
+          taxId: "Tax ID: 1234567890", // Optional.
+      },
+      invoice: {
+          number: "1721", // String or number.
+          date: "25/12/2023", // Default is current date.
+          dueDate: "25/12/2023", // Default is current date.
+          status: "Paid!",
+          currency: "€", // Default is "$",
+          path: "./invoice.pdf", // Required. Path where you would like to generate the PDF file. 
+      },
+      items: [
+          {
+              name: "Cloud VPS Server - Starter Plan",
+              quantity: 1,
+              price: 400,
+              tax: 0, // Specify tax in percentage. Default is 0.
+          },
+          {
+              name: "Domain Registration - example.com",
+              quantity: 1,
+              price: 20,
+              tax: 0, // Specify tax in percentage. Default is 0.
+          },
+          {
+              name: "Maintenance Charge - Yearly",
+              quantity: 1,
+              price: 300,
+              tax: 0, // Specify tax in percentage. Default is 0.
+          },
+      ],
+      qr: {
+          data: "https://www.festrolcorp.io",
+          width: 100, // Default is 50.
+      },
+      note: {
+          text: "Thank you for your business.",
+          italic: false, // Default is true.
+      }
+  };
+  const invoice = new PDFInvoice(payload);
+  const pdfPath = await invoice.create(); // Returns the full path to the PDF file.
 
-    // Create a new PDF document
-    const doc = new PDFDocument();
+  // Send the PDF as a response to the client
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `attachment; filename=Invoice_${payload.invoice.number}.pdf`);
 
-    // Set response headers to indicate a file download
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=Receipt_${payment_id}.pdf`);
-
-    // Pipe the document to the response (this will send the PDF as a stream)
-    doc.pipe(res);
-
-    // Add content to the PDF
-    doc.fontSize(25).text('Payment Receipt', { align: 'center' });
-    doc.moveDown();
-    doc.fontSize(14).text(`Payment ID: ${paymentDetails.id}`);
-    doc.text(`Amount: ₹${paymentDetails.amount / 100}`);
-    doc.text(`Currency: ${paymentDetails.currency}`);
-    doc.text(`Status: ${paymentDetails.status}`);
-    doc.text(`Order ID: ${paymentDetails.order_id}`);
-    doc.text(`Email: ${paymentDetails.email}`);
-    doc.text(`Contact: ${paymentDetails.contact}`);
-    doc.text(`Payment Method: ${paymentDetails.method}`);
-
-    // Finalize the PDF and end the stream
-    doc.end();
+  // Read the generated PDF and pipe it to the response
+  const pdfStream = fs.createReadStream(pdfPath);
+  pdfStream.pipe(res);
+  // Optionally, delete the PDF after it's been served
+  pdfStream.on('end', () => {
+      fs.unlinkSync(pdfPath); // Delete file after serving
+  });
   } catch (error) {
     console.error("Error generating receipt: ", error);
     res.status(500).send('Error generating receipt');

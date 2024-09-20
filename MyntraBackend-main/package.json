@@ -12,6 +12,7 @@
   "description": "",
   "dependencies": {
     "@elastic/elasticsearch": "^8.15.0",
+    "@h1dd3nsn1p3r/pdf-invoice": "^1.0.8",
     "bcrypt": "^5.1.1",
     "chalk": "^4.1.2",
     "cloudinary": "^2.4.0",
