@@ -1,5 +1,6 @@
 const razorpayInstance = require("../rozarpay");
-
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
 // Create Order in Razorpay
 exports.createOrder = async (req, res) => {
   console.log(req.body.amount);
@@ -37,3 +38,40 @@ exports.verifyPayment = async (req, res) => {
     res.status(400).json({ message: "Payment verification failed" });
   }
 };
+
+exports.DownloadReciept =  async (req, res) => {
+  const payment_id = req.query.payment_id;
+  console.log(payment_id)
+  try {
+    // Fetch payment details from Razorpay
+    const paymentDetails = await razorpayInstance.payments.fetch(payment_id);
+
+    // Create a new PDF document
+    const doc = new PDFDocument();
+
+    // Set response headers to indicate a file download
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=Receipt_${payment_id}.pdf`);
+
+    // Pipe the document to the response (this will send the PDF as a stream)
+    doc.pipe(res);
+
+    // Add content to the PDF
+    doc.fontSize(25).text('Payment Receipt', { align: 'center' });
+    doc.moveDown();
+    doc.fontSize(14).text(`Payment ID: ${paymentDetails.id}`);
+    doc.text(`Amount: ₹${paymentDetails.amount / 100}`);
+    doc.text(`Currency: ${paymentDetails.currency}`);
+    doc.text(`Status: ${paymentDetails.status}`);
+    doc.text(`Order ID: ${paymentDetails.order_id}`);
+    doc.text(`Email: ${paymentDetails.email}`);
+    doc.text(`Contact: ${paymentDetails.contact}`);
+    doc.text(`Payment Method: ${paymentDetails.method}`);
+
+    // Finalize the PDF and end the stream
+    doc.end();
+  } catch (error) {
+    console.error("Error generating receipt: ", error);
+    res.status(500).send('Error generating receipt');
+  }
+}

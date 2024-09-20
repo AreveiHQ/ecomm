@@ -21,7 +21,30 @@ const ShowOrder = () => {
     };
     fetchOrders();
   }, []);
+  const downloadReceipt = async (payment_id) => {
+    const response = await axios.get(`${server}/v1/payment/download?payment_id=${payment_id}`, {
+      responseType: 'blob', // Important for downloading files
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      }
+    });
 
+    // Create a blob from the response data
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    
+    // Create a link to trigger download
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `Receipt_${payment_id}.pdf`);
+    
+    // Append to DOM and trigger download
+    document.body.appendChild(link);
+    link.click();
+    
+    // Clean up
+    link.remove();
+  };
   return (
     <div className="w-full min-h-screen bg-gray-100 py-10 px-4 mt-16">
       <div className="max-w-4xl mx-auto">
@@ -73,7 +96,9 @@ const ShowOrder = () => {
                   <p><strong>Amount:</strong> Rs. {order.amount}</p>
                   <p><strong>Address:</strong> {order.address}</p>
                 </div>
+                <button onClick={()=>downloadReceipt(order.paymentId)} className=" p-3 bg-yellow-500 rounded-md">Download Receipt</button>
               </div>
+              
             ))
           )}
         </div>
